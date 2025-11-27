@@ -2,7 +2,6 @@
 {
     public class Emergency
     {
-        // ----------- Emergency Contact -----------
         public int Id { get; set; }
         public string EmergencyContactName { get; set; } = string.Empty;
         public string EmergencyContactRelation { get; set; } = string.Empty;

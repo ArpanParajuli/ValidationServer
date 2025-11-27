@@ -3,14 +3,12 @@
     public class Guardian
     {
         public int Id { get; set; } 
-
-        public string? GuardianFullName { get; set; }
-        public string? GuardianRelation { get; set; }
-        public string? GuardianOccupation { get; set; }
-        public string? GuardianMobileNumber { get; set; }
-        public string? GuardianEmail { get; set; }
-
+        public string? FullName { get; set; }
+        public string? Occupation { get; set; }
+        public string? MobileNumber { get; set;}
+        public string? Email { get; set; }
+        public string? Relation {get; set;}
         public int StudentId { get; set; }
-        public Student Student { get; set; }
+        public Student? Student { get; set; }
     }
 }

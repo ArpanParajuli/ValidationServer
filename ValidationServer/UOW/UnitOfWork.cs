@@ -9,9 +9,7 @@ namespace ValidationServer.UOW
         private readonly AppDbContext _context;
 
         public IGenericRepository<Student> Students { get; }
-        public IGenericRepository<PermanentAddress> PermanentAddress { get; }
-        public IGenericRepository<TemporaryAddress> TemporaryAddress { get; }
-        public IGenericRepository<Parent> Parents { get; }
+        public IGenericRepository<Address> Addresses { get; }
         public IGenericRepository<Guardian> Guardians { get; }
         public IGenericRepository<Scholarship> Scholarships { get; }
         public IGenericRepository<Disability> Disabilities { get; }
@@ -19,6 +17,8 @@ namespace ValidationServer.UOW
         public IGenericRepository<Emergency> Emergency { get; }
         public IGenericRepository<SecondaryInfo> SecondaryInfo { get; }
         public IGenericRepository<Ethnicity> Ethinicities { get; }
+        public IGenericRepository<Nationality> Nationalities { get; }
+        public IGenericRepository<Citizenship> Citizenships { get; }
 
 
         public UnitOfWork(AppDbContext context)
@@ -26,9 +26,8 @@ namespace ValidationServer.UOW
             _context = context;
 
             Students = new GenericRepository<Student>(_context);
-            PermanentAddress = new GenericRepository<PermanentAddress>(_context);
-            TemporaryAddress = new GenericRepository<TemporaryAddress>(_context);
-            Parents = new GenericRepository<Parent>(_context);
+            Addresses = new GenericRepository<Address>(_context);
+            Citizenships = new GenericRepository<Citizenship>(_context);
             Guardians = new GenericRepository<Guardian>(_context);
             Scholarships = new GenericRepository<Scholarship>(_context);
             Disabilities = new GenericRepository<Disability>(_context);

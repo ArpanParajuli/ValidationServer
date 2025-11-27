@@ -4,7 +4,6 @@ namespace ValidationServer.Models.Students
 {
     public class Bank
     {
-        // ------------ Bank Details ------------
         public int Id { get; set; }
         public string? BankAccountHolderName { get; set; }
         public string? BankName { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace ValidationServer.Service
+﻿namespace ValidationServer.Services
 {
     public class StudentService
     {

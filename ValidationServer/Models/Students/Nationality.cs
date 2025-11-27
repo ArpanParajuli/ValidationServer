@@ -1,10 +1,10 @@
 ﻿namespace ValidationServer.Models.Students
 {
-    public class Financial
+    public class Nationality
     {
         public int Id { get; set; }
-        public string AnnualFamilyIncome { get; set; } = "<5 Lakh";
+        public string Name { get; set; } = "Nepali";
         public int StudentId { get; set; }
-        public Student Student { get; set; }
+        public Student? Student { get; set;}
     }
 }

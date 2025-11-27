@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ValidationServer.DTOs;
 using ValidationServer.Models.Students;
+using ValidationServer.Services;
 using ValidationServer.UOW;
 
 namespace ValidationServer.Controllers
@@ -12,68 +13,107 @@ namespace ValidationServer.Controllers
     public class StudentController : ControllerBase
     {
         private readonly IMapper _mapper;
-
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IImageService _imageService;
 
-        public StudentController(IMapper mapper, IUnitOfWork unitOfWork)
+        public StudentController(IMapper mapper, IUnitOfWork unitOfWork, IImageService imageService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _imageService = imageService;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-
             var obj = await _unitOfWork.Students.GetAllAsync();
             return Ok(obj);
         }
 
-
         [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] CreateStudentDTOs dto)
+        public async Task<IActionResult> Create([FromForm] CreateStudentDTO dto)
         {
-            var student = _mapper.Map<Student>(dto.studentDTO);
-            await _unitOfWork.Students.AddAsync(student);
-            await _unitOfWork.SaveAsync();
+            try
+            {
+                // Handle the student DTO
+                var student = _mapper.Map<Student>(dto.StudentDTO);
 
-            var permanentAddress = _mapper.Map<PermanentAddress>(dto.permanentAddressDTO);
-            permanentAddress.StudentId = student.Id;
+                // Handle image upload - check if image is provided
+                if (dto.StudentDTO.ImagePath != null && dto.StudentDTO.ImagePath.Length > 0)
+                {
+                    var imageUrl = await _imageService.SaveStudentImageAsync(dto.StudentDTO.ImagePath);
+                    student.ImagePath = imageUrl;
+                }
+                else
+                {
+                    student.ImagePath = "/uploads/students/default-avatar.png";
+                }
 
-            var temporaryAddress = _mapper.Map<TemporaryAddress>(dto.temporaryDTO);
-            temporaryAddress.StudentId = student.Id;
+                await _unitOfWork.Students.AddAsync(student);
+                await _unitOfWork.SaveAsync();
 
-            var parent = _mapper.Map<Parent>(dto.parentDTO);
-            parent.StudentId = student.Id;
+                // Handle Address
+                var address = _mapper.Map<Address>(dto.AddressDTO);
+                address.StudentId = student.Id;
 
-            var secondary = _mapper.Map<SecondaryInfo>(dto.secondaryInfoDTO);
-            secondary.StudentId = student.Id;
+                if (dto.AddressDTO.isTemporarySame)
+                {
+                    address.AddressType = AddressType.Both;
+                }
+                else
+                {
+                    address.AddressType = AddressType.Permanent;
+                    var tempAddress = _mapper.Map<Address>(dto.AddressDTO);
+                    tempAddress.StudentId = student.Id;
+                    tempAddress.AddressType = AddressType.Temporary;
+                    await _unitOfWork.Addresses.AddAsync(tempAddress);
+                }
 
-            var scholarship = _mapper.Map<Scholarship>(dto.scholarshipDTO);
-            scholarship.StudentId = student.Id;
+                await _unitOfWork.Addresses.AddAsync(address);
 
-            var emergency = _mapper.Map<Emergency>(dto.emergencyDTO);
-            emergency.StudentId = student.Id;
+                // Handle Guardian
+                var guardian = _mapper.Map<Guardian>(dto.GuardianDTO);
+                guardian.StudentId = student.Id;
+                await _unitOfWork.Guardians.AddAsync(guardian);
 
-            var ethnicity = _mapper.Map<Ethnicity>(dto.ethnicityDTO);
-            ethnicity.StudentId = student.Id;
+                // Handle Secondary Info
+                var secondary = _mapper.Map<SecondaryInfo>(dto.SecondaryInfoDTO);
+                secondary.StudentId = student.Id;
+                await _unitOfWork.SecondaryInfo.AddAsync(secondary);
 
-            await _unitOfWork.PermanentAddress.AddAsync(permanentAddress);
-            await _unitOfWork.TemporaryAddress.AddAsync(temporaryAddress);
-            await _unitOfWork.Parents.AddAsync(parent);
-            await _unitOfWork.SecondaryInfo.AddAsync(secondary);
-            await _unitOfWork.Scholarships.AddAsync(scholarship);
-            await _unitOfWork.Emergency.AddAsync(emergency);
-            await _unitOfWork.Ethinicities.AddAsync(ethnicity);
+                // Handle Scholarship
+                var scholarship = _mapper.Map<Scholarship>(dto.ScholarshipDTO);
+                scholarship.StudentId = student.Id;
+                await _unitOfWork.Scholarships.AddAsync(scholarship);
 
-            await _unitOfWork.SaveAsync();
+                // Handle Emergency
+                var emergency = _mapper.Map<Emergency>(dto.EmergencyDTO);
+                emergency.StudentId = student.Id;
+                await _unitOfWork.Emergency.AddAsync(emergency);
 
+                // Handle Ethnicity
+                var ethnicity = _mapper.Map<Ethnicity>(dto.EthnicityDTO);
+                ethnicity.StudentId = student.Id;
+                await _unitOfWork.Ethinicities.AddAsync(ethnicity);
 
-            return Ok("Student created successfully");
+                await _unitOfWork.SaveAsync();
+
+                return Ok(new { message = "Student created successfully", studentId = student.Id });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception details
+                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+
+                // Return detailed error information
+                return StatusCode(500, new
+                {
+                    message = "An error occurred while creating the student",
+                    error = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
         }
-
-
     }
-
-
 }

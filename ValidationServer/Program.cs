@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationServer.Data;
 using ValidationServer.Mapper;
+using ValidationServer.Services;
 using ValidationServer.UOW;
 
 
@@ -18,6 +19,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
 
+builder.Services.AddSingleton<IImageService , ImageService>();
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -30,14 +34,25 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 
 
+if (app.Environment.IsDevelopment())
+{
+    //app.UseSwagger();
+    //app.UseSwaggerUI();
+}
+
+
 app.UseHttpsRedirection();
 
 app.UseCors("NextJsPolicy");
+
+app.UseStaticFiles(); // Allows serving wwwroot files
 
 app.UseAuthorization();
 

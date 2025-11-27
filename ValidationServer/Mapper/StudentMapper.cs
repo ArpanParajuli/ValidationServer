@@ -10,9 +10,9 @@ namespace ValidationServer.Mapper
         public StudentMapper()
         {
             CreateMap<StudentDTO, Student>();
-            CreateMap<PermanentAddressDTO, PermanentAddress>();
-            CreateMap<TemporaryDTO, TemporaryAddress>();
-            CreateMap<ParentDTO, Parent>();
+            CreateMap<AddressDTO, Address>();
+            CreateMap<CitizenshipDTO, Citizenship>();
+            CreateMap<GuardianDTO, Guardian>();
             CreateMap<ScholarshipDTO, Scholarship>();
             CreateMap<EmergencyDTO, Emergency>();
             CreateMap<EthnicityDTO, Ethnicity>();
