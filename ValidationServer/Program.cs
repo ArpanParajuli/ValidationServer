@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
 using ValidationServer.Data;
 using ValidationServer.Mapper;
+using ValidationServer.Repositories;
 using ValidationServer.Services;
 using ValidationServer.UOW;
 
@@ -17,9 +18,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
 
 builder.Services.AddSingleton<IImageService , ImageService>();
+
+
+builder.Services.AddScoped<IStudentService , StudentService>();
 
 
 

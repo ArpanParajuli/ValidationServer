@@ -29,7 +29,7 @@ namespace ValidationServer.Services
                 await imageFile.CopyToAsync(stream);
             }
 
-            return $"/uploads/students/{fileName}";
+            return fileName;
         }
     }
 }

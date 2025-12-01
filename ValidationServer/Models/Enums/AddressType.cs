@@ -1,4 +1,4 @@
-namespace ValidationServer.Models.Students
+namespace ValidationServer.Models.Enums
 {
     public enum AddressType
     {

@@ -13,6 +13,10 @@ namespace ValidationServer.DTOs
        public ScholarshipDTO ScholarshipDTO { get; set;} = new();
        public EmergencyDTO EmergencyDTO { get; set; } = new();
        public EthnicityDTO EthnicityDTO {get; set;} = new();
+       public DocumentsDto DocumentsDTO { get; set; } = new();
+       public AcademicEnrollmentDTO AcademicEnrollmentDTO { get; set; } = new();
+       public List<AcademicHistoryDTO> AcademicHistories { get; set; } = new();
+
 
     }
 }

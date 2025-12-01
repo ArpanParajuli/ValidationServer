@@ -1,4 +1,4 @@
-using ValidationServer.Models.Students;
+using ValidationServer.Models.Enums;
 
 namespace ValidationServer.Models.Students
 {

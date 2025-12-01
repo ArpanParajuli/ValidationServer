@@ -24,5 +24,13 @@ namespace ValidationServer.Repositories
 
         public void Delete(T entity) => _dbSet.Remove(entity);
 
+
+        public async Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+            return entities;
+        }
+
     }
 }

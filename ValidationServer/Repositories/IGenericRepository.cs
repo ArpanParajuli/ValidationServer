@@ -7,5 +7,8 @@
         Task AddAsync(T entity);
         void Update(T entity);
         void Delete(T entity);
+
+
+        Task<IEnumerable<T>> AddRangeAsync(IEnumerable<T> entities);
     }
 }

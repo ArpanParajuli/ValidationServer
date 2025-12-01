@@ -6,17 +6,23 @@ namespace ValidationServer.UOW
 {
     public interface IUnitOfWork
     {
-        public IGenericRepository<Student> Students { get; }
-        public IGenericRepository<Address> Addresses { get; }
-        public IGenericRepository<Guardian> Guardians { get; }
-        public IGenericRepository<Scholarship> Scholarships { get; }
-        public IGenericRepository<Disability> Disabilities { get; }
-        public IGenericRepository<Bank> Banks { get; }
-        public IGenericRepository<Emergency> Emergency { get; }
-        public IGenericRepository<SecondaryInfo> SecondaryInfo { get; }
-        public IGenericRepository<Ethnicity> Ethinicities { get; }
-        public IGenericRepository<Nationality> Nationalities { get; }
-        public IGenericRepository<Citizenship> Citizenships { get; }
+       IGenericRepository<Student> Students { get; }
+       IGenericRepository<Address> Addresses { get; }
+       IGenericRepository<Guardian> Guardians { get; }
+       IGenericRepository<Scholarship> Scholarships { get; }
+       IGenericRepository<Disability> Disabilities { get; }
+       IGenericRepository<Bank> Banks { get; }
+       IGenericRepository<Emergency> Emergency { get; }
+       IGenericRepository<SecondaryInfo> SecondaryInfo { get; }
+       IGenericRepository<Ethnicity> Ethinicities { get; }
+       IGenericRepository<Nationality> Nationalities { get; }
+       IGenericRepository<Citizenship> Citizenships { get; }
+
+       IGenericRepository<Document> Documents { get; }
+
+       IGenericRepository<AcademicEnrollment> AcademicEnrollments { get; }
+
+       IGenericRepository<AcademicHistory> AcademicHistorys { get; }
 
 
         Task<int> SaveAsync();

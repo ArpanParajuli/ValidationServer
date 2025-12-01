@@ -23,7 +23,12 @@ namespace ValidationServer.Data
         public DbSet<Citizenship> Citizenships { get; set; }
         public DbSet<Nationality> Nationalities { get; set; }
 
-    
+        public DbSet<Document> Documents { get; set; }
+
+        public DbSet<AcademicEnrollment> AcademicEnrollments { get; set; }
+        public DbSet<AcademicHistory> AcademicHistorys { get; set; }
+
+
 
 
 

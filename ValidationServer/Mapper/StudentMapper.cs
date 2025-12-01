@@ -17,6 +17,10 @@ namespace ValidationServer.Mapper
             CreateMap<EmergencyDTO, Emergency>();
             CreateMap<EthnicityDTO, Ethnicity>();
             CreateMap<SecondaryInfoDTO, SecondaryInfo>();
+            CreateMap<DocumentsDto, Document>();
+
+            CreateMap<AcademicEnrollmentDTO, AcademicEnrollment>();
+            CreateMap<AcademicHistoryDTO, AcademicHistoryDTO>();
         }
     }
 }
