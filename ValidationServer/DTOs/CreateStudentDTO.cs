@@ -17,6 +17,8 @@ namespace ValidationServer.DTOs
        public AcademicEnrollmentDTO AcademicEnrollmentDTO { get; set; } = new();
        public List<AcademicHistoryDTO> AcademicHistories { get; set; } = new();
 
+        public TemporaryAddress TemporaryAddress { get; set; } = new();
+
 
     }
 }

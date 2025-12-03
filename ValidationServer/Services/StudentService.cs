@@ -90,11 +90,6 @@ namespace ValidationServer.Services
                 await _unitOfWork.Ethinicities.AddAsync(ethnicity);
 
 
-                //var documents = _mapper.Map<Document>(dto.DocumentsDTO);
-                //documents.StudentId = student.Id;
-
-
-
                 var documentList = new List<Document>();
 
 
@@ -174,15 +169,34 @@ namespace ValidationServer.Services
                 }
 
 
+                var temporarydto = dto.TemporaryAddress;
+                if (temporarydto != null)
+                {
+                    var tempAddr = new Address
+                    {
+                        StudentId = student.Id,
+                        AddressType = AddressType.Temporary,
+                        Province = temporarydto.Province,
+                        District = temporarydto.District,
+                        Municipality = temporarydto.Municipality,
+                        WardNumber = temporarydto.WardNumber,
+                        ToleStreet = temporarydto.ToleStreet,
+                        HouseNumber = temporarydto.HouseNumber,
+                    };
+                    await _unitOfWork.Addresses.AddAsync(tempAddr);
+                }
 
 
+                var citizenshipdata = _mapper.Map<Citizenship>(dto.CitizenshipDTO);
 
+                if(citizenshipdata != null)
+                {
+                    citizenshipdata.StudentId = student.Id;
+                    await _unitOfWork.Citizenships.AddAsync(citizenshipdata);
+                }
+               
 
-                await _unitOfWork.SaveAsync();
-
-
-
-
+                  await _unitOfWork.SaveAsync();
             }
             catch (Exception ex)
             {
