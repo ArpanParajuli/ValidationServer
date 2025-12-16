@@ -5,16 +5,16 @@ namespace ValidationServer.DTOs
 {
     public class AcademicHistoryDTO
     {
-        [Required]
+      //  [Required]
         public int Level { get; set;}
 
-        [Required]
+      //  [Required]
         public string BoardUniversity { get; set; }
 
-        [Required]
+     //   [Required]
         public string InstitutionName { get; set; }
 
-        [Required]
+       // [Required]
         public DateOnly PassedYear { get; set; }
 
         public string DivisionOrGPA { get; set; }

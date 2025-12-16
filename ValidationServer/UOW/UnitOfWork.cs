@@ -1,4 +1,6 @@
-﻿using ValidationServer.Data;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using System.Transactions;
+using ValidationServer.Data;
 using ValidationServer.Models.Students;
 using ValidationServer.Repositories;
 
@@ -7,6 +9,8 @@ namespace ValidationServer.UOW
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
+
+        private  IDbContextTransaction _transaction;
         public IGenericRepository<Student> Students { get; }
         public IGenericRepository<Address> Addresses { get; }
         public IGenericRepository<Guardian> Guardians { get; }
@@ -26,6 +30,9 @@ namespace ValidationServer.UOW
         public IGenericRepository<AcademicHistory> AcademicHistorys { get; }
 
 
+        public IStudentRepository StudentRepository { get; }
+
+
         public UnitOfWork(AppDbContext context,
             IGenericRepository<Student> students,
             IGenericRepository<Address> addresses,
@@ -40,7 +47,8 @@ namespace ValidationServer.UOW
             IGenericRepository<Citizenship> citizenships,
             IGenericRepository<Document> documents,
             IGenericRepository<AcademicHistory> academicHistorys,
-            IGenericRepository<AcademicEnrollment> academicEnrollments
+            IGenericRepository<AcademicEnrollment> academicEnrollments,
+            IStudentRepository studentRepository
             )
         {
             _context = context;
@@ -58,11 +66,52 @@ namespace ValidationServer.UOW
             Documents = documents;
             AcademicEnrollments = academicEnrollments;
             AcademicHistorys = academicHistorys;
+
+            StudentRepository = studentRepository;
         }
 
         public async Task<int> SaveAsync()
         {
             return await _context.SaveChangesAsync();
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
+
+            return _transaction;
+        }
+
+        public  async Task CommitTransactionAsync()
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                if (_transaction != null)
+                {
+                    await _transaction.CommitAsync();
+                    await _transaction.DisposeAsync();
+                    _transaction = null;
+                }
+            }
+
+            catch
+            {
+                await RollbackTransactionAsync();
+                Console.WriteLine("Transaction commit failed. Rolled back the transaction.");
+                throw;
+            }
+        }
+         
+        public async Task RollbackTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
         }
     }
 }

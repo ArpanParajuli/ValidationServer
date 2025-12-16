@@ -5,24 +5,24 @@ namespace ValidationServer.DTOs
 {
     public class AcademicEnrollmentDTO
     {
-        [Required]
+      //  [Required]
         public string Faculty { get; set; }  
-        [Required]
+      //  [Required]
         public string Program { get; set; } 
-        [Required]
+      //  [Required]
         public Level Level { get; set; } 
-        [Required]
+       // [Required]
         public string Semester { get; set; }
         public string Section { get; set; }
-        [Required]
+       // [Required]
         public string RollNumber { get; set; }
-        [Required]
+      //  [Required]
         public string RegistrationNumber { get; set; }
 
-        [Required]
-        public DateTime EnrollDate { get; set; }
+      //  [Required]
+        public DateOnly EnrollDate { get; set; }
 
-        [Required]
+       // [Required]
         public int AcademicStatus { get; set; }
     }
 

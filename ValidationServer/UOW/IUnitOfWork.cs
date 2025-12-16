@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.EntityFrameworkCore.Storage;
 using ValidationServer.Models.Students;
 using ValidationServer.Repositories;
 
@@ -24,7 +25,13 @@ namespace ValidationServer.UOW
 
        IGenericRepository<AcademicHistory> AcademicHistorys { get; }
 
+       IStudentRepository StudentRepository { get; }
+
 
         Task<int> SaveAsync();
+
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
     }
 }

@@ -10,6 +10,7 @@ using ValidationServer.UOW;
 
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -19,7 +20,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
+
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 
 builder.Services.AddScoped<IUnitOfWork , UnitOfWork>();
 
@@ -40,9 +43,15 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(o =>
+    {
+        o.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -50,8 +59,8 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 
@@ -59,7 +68,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("NextJsPolicy");
 
-app.UseStaticFiles(); // Allows serving wwwroot files
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

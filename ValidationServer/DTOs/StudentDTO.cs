@@ -2,6 +2,7 @@ namespace ValidationServer.DTOs
 {
     public class StudentDTO
     {
+        public int Id { get; set; }
         public IFormFile? ImagePath { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string? MiddleName { get; set; }

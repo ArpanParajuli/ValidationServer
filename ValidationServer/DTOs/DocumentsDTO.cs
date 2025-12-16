@@ -2,10 +2,13 @@
 
 namespace ValidationServer.DTOs
 {
-    public class DocumentsDto
+    public class DocumentsDTO
     {
-        [Required] public IFormFile CharacterCertificate { get; set; }
-        [Required] public IFormFile Signature { get; set; }
-        [Required] public IFormFile Citizenship { get; set; }
+       // [Required] 
+        public IFormFile? CharacterCertificate { get; set; }
+       // [Required]
+        public IFormFile? Signature { get; set; }
+        //[Required]
+        public IFormFile? Citizenship { get; set; }
     }
 }

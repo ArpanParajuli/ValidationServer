@@ -11,7 +11,7 @@ namespace ValidationServer.Models.Students
         public Student Student { get; set; }
 
         [Required]
-        public Level? Level { get; set; }
+        public int? Level { get; set; }
 
         [Required]
         public string BoardUniversity { get; set; }
