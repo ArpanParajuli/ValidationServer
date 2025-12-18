@@ -1,8 +1,8 @@
 ﻿namespace ValidationServer.Models.Students
 {
-    public class Citizenship
+    public class Citizenship : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string CitizenshipNumber { get; set; } = string.Empty;
         public DateOnly CitizenshipIssueDate { get; set; }
         public string CitizenshipIssueDistrict { get; set; } = string.Empty;

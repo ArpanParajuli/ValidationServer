@@ -2,9 +2,9 @@
 
 namespace ValidationServer.Models.Students
 {
-    public class Award
+    public class Award : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         public int StudentId { get; set; }
         public Student Student { get; set; }

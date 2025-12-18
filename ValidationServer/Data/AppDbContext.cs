@@ -9,6 +9,10 @@ namespace ValidationServer.Data
 
         }
 
+
+           
+          
+  
         public DbSet<Student> Students { get; set; }
         public DbSet<Bank> Banks { get; set; }
         public DbSet<Guardian> Guardians { get; set; }
@@ -30,6 +34,18 @@ namespace ValidationServer.Data
         public DbSet<Award> Awards { get; set; }
 
         public DbSet<Interest> Interests { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+
+            modelBuilder.Entity<Scholarship>(entity =>
+            {
+                entity.Property(sc => sc.ScholarshipAmount).HasPrecision(18, 2);
+            });
+        }
 
 
 

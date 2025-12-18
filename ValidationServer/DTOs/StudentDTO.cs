@@ -16,9 +16,7 @@ namespace ValidationServer.DTOs
         public string FirstName { get; set; } = string.Empty;
 
 
-        [Required]
-        [StringLength(50, MinimumLength = 1)]
-        public string MiddleName { get; set; } = string.Empty;
+        public string? MiddleName { get; set; }
 
         [Required]
         [StringLength(50, MinimumLength = 1)]

@@ -30,7 +30,7 @@ namespace ValidationServer.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(Guid id)
         {
 
             var obj = await _studentService.GetStudentByIdAsync(id);
@@ -54,7 +54,7 @@ namespace ValidationServer.Controllers
 
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id , [FromForm] StudentUpdateDTO dto)
+        public async Task<IActionResult> Update(Guid id , [FromForm] StudentUpdateDTO dto)
         {
            var IsSuccess =  await _studentService.Update(id,dto);
 
@@ -67,7 +67,7 @@ namespace ValidationServer.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             var IsSuccess = await _studentService.Delete(id);
 

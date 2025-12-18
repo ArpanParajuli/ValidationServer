@@ -1,8 +1,8 @@
 ﻿namespace ValidationServer.Models.Students
 {
-    public class Student
+    public class Student : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string ImagePath { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string? MiddleName { get; set; }

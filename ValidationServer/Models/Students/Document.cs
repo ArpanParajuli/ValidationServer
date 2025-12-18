@@ -3,9 +3,9 @@ using ValidationServer.Models.Enums;
 
 namespace ValidationServer.Models.Students
 {
-    public class Document
+    public class Document : BaseEntity
     {
-        public int Id { get; set;}
+        //public int Id { get; set;}
 
         public int StudentId { get; set;}
         public Student Student { get; set; }

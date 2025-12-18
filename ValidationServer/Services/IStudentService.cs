@@ -9,11 +9,12 @@ namespace ValidationServer.Services
     {
         Task<bool> Create(CreateStudentDTO dto);
 
-        Task<StudentReponseDTO?> GetStudentByIdAsync(int id);
+        Task<StudentReponseDTO?> GetStudentByIdAsync(Guid id);
 
-        Task<bool> Update(int id, StudentUpdateDTO dto);
+        Task<bool> Update(Guid OwnerId, StudentUpdateDTO dto);
 
-        Task<bool> Delete(int id);
+
+        Task<bool> Delete(Guid id);
 
         Task<IEnumerable<Student>> GetAllStudentAsync();
 

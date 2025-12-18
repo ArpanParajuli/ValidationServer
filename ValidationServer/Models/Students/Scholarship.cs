@@ -2,9 +2,9 @@
 
 namespace ValidationServer.Models.Students
 {
-    public class Scholarship
+    public class Scholarship : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string? ScholarshipType { get; set; }
         public string? ScholarshipProviderName { get; set; }
         public decimal? ScholarshipAmount { get; set; }

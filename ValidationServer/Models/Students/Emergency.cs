@@ -1,8 +1,8 @@
 ﻿namespace ValidationServer.Models.Students
 {
-    public class Emergency
+    public class Emergency : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string EmergencyContactName { get; set; } = string.Empty;
         public string EmergencyContactRelation { get; set; } = string.Empty;
         public string EmergencyContactNumber { get; set; } = string.Empty;

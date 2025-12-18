@@ -1,8 +1,8 @@
 ﻿namespace ValidationServer.Models.Students
 {
-    public class Guardian
+    public class Guardian : BaseEntity
     {
-        public int Id { get; set; } 
+        //public int Id { get; set; } 
         public string? FullName { get; set; }
         public string? Occupation { get; set; }
         public string? MobileNumber { get; set;}

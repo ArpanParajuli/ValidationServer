@@ -1,15 +1,19 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
+using System.Net;
+using System.Xml.Schema;
 using ValidationServer.DTOs;
 using ValidationServer.DTOs.Response;
 using ValidationServer.Models.Enums;
 using ValidationServer.Models.Students;
+using ValidationServer.Repositories;
 using ValidationServer.UOW;
 
 namespace ValidationServer.Services
@@ -18,23 +22,25 @@ namespace ValidationServer.Services
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+     
         private readonly IImageService _imageService;
         public StudentService(IMapper mapper, IUnitOfWork unitOfWork, IImageService imageService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _imageService = imageService;
+            
         }
 
         public async Task<IEnumerable<Student>> GetAllStudentAsync()
         {
-            return await _unitOfWork.Students.GetAllAsync();
+            return await _unitOfWork.StudentRepository.GetAllStudentsFiltered().ToListAsync();
         }
 
-        public async Task<StudentReponseDTO?> GetStudentByIdAsync(int id)
+        public async Task<StudentReponseDTO?> GetStudentByIdAsync(Guid id)
         {
 
-            var student = await _unitOfWork.StudentRepository.GetById(id);
+            var student = await _unitOfWork.StudentRepository.GetByOwnerId(id);
 
             if (student == null)
                 return null;
@@ -61,13 +67,14 @@ namespace ValidationServer.Services
             return dto;
         }
 
-        public async Task<bool> Delete(int id)
+        public async Task<bool> Delete(Guid id)
         {
-            var student = await _unitOfWork.Students.GetByIdAsync(id);
+            var student = await _unitOfWork.StudentRepository.GetByOwnerId(id);
 
             if (student != null)
             {
-                _unitOfWork.Students.Delete(student);
+                //_unitOfWork.Students.Delete(student);
+                student.IsDeleted = true;
                 await _unitOfWork.SaveAsync();
                 return true;
             }
@@ -75,17 +82,19 @@ namespace ValidationServer.Services
             return false;
         }
 
-        public async Task<bool> Update(int id, StudentUpdateDTO dto)
+        public async Task<bool> Update(Guid OwnerId, StudentUpdateDTO dto)
         {
 
 
-             await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.BeginTransactionAsync();
 
 
             try
             {
 
-                var student = await _unitOfWork.StudentRepository.GetById(id);
+                //var student = await _unitOfWork.StudentRepository.GetById(id);
+
+                var student = await _unitOfWork.StudentRepository.GetByOwnerId(OwnerId);
                 if (student == null)
                     return false;
 
@@ -97,7 +106,7 @@ namespace ValidationServer.Services
                     var imageUrl = await _imageService.SaveStudentImageAsync(dto.StudentDTO.ImagePath);
                     student.ImagePath = $"/uploads/students/{imageUrl}";
                 }
-               
+
 
 
 
@@ -110,6 +119,9 @@ namespace ValidationServer.Services
                 student.Email = dto.StudentDTO.Email;
                 student.PrimaryMobile = dto.StudentDTO.PrimaryMobile;
                 student.Gender = dto.StudentDTO.Gender;
+                student.UpdatedAt = DateTime.Now;
+                student.UpdatedBy = student.OwnerId;
+
 
 
 
@@ -135,24 +147,111 @@ namespace ValidationServer.Services
                 _mapper.Map(dto.EthnicityDTO, student.Ethnicity);
 
 
+
                 foreach (var address in student.Addresses)
                 {
-                    foreach (var dtoAddress in dto.AddressDTO)
-                    {
-                        if (address.AddressType == AddressType.Permanent && dtoAddress.IsPermanent == 1)
-                        {
-                            _mapper.Map(dtoAddress, address);
-                        }
-                        else if (address.AddressType == AddressType.Temporary && dtoAddress.IsPermanent == 0)
-                        {
-                            _mapper.Map(dtoAddress, address);
-                        }
-                        else if (address.AddressType == AddressType.Both)
-                        {
-                            _mapper.Map(dtoAddress, address);
-                        }
-                    }
+                    address.IsDeleted = true;
                 }
+
+
+
+                //foreach (var address in student.Addresses)
+                //{
+                //    foreach (var dtoAddress in dto.AddressDTO)
+                //    {
+                //        if (address.AddressType == AddressType.Permanent && dtoAddress.IsPermanent == 1)
+                //        {
+                //            _mapper.Map(dtoAddress, address);
+                //        }
+                //        else if (address.AddressType == AddressType.Temporary && dtoAddress.IsPermanent == 0)
+                //        {
+                //            _mapper.Map(dtoAddress, address);
+                //        }
+                //        else if (address.AddressType == AddressType.Both)
+                //        {
+                //            _mapper.Map(dtoAddress, address);
+                //        }
+                //    }
+                //}
+
+
+                if (dto.AddressDTO != null)
+                {
+
+
+                    var addressNew = new List<Address>();
+
+
+
+
+
+                    foreach (var address in dto.AddressDTO)
+                    {
+
+
+                        if (dto.AddressDTO.Count == 1)
+                        {
+                            addressNew.Add(new Address
+                            {
+                                StudentId = student.Id,
+                                OwnerId = student.OwnerId,
+                                AddressType = AddressType.Both,
+                                CreatedAt = DateTime.Now,
+                                CreatedBy = student.OwnerId,
+                                Province = address.Province,
+                                District = address.District,
+                                Municipality = address.Municipality,
+                                WardNumber = address.WardNumber,
+                                ToleStreet = address.ToleStreet,
+                                HouseNumber = address.HouseNumber
+                            });
+                        }
+
+
+                        if (dto.AddressDTO.Count == 2)
+                        {
+                            addressNew.Add(new Address
+                            {
+                                StudentId = student.Id,
+                                OwnerId = student.OwnerId,
+                                AddressType = (address.IsPermanent == 1) ? AddressType.Permanent : AddressType.Temporary,
+                                CreatedAt = DateTime.Now,
+                                CreatedBy = student.OwnerId,
+                                Province = address.Province,
+                                District = address.District,
+                                Municipality = address.Municipality,
+                                WardNumber = address.WardNumber,
+                                ToleStreet = address.ToleStreet,
+                                HouseNumber = address.HouseNumber
+                            });
+                        }
+
+
+
+
+
+
+                    }
+
+
+                    await _unitOfWork.Addresses.AddRangeAsync(addressNew);
+
+
+
+
+
+                }
+
+              
+
+
+
+
+                foreach (var guardian in student.Guardians)
+                {
+                    guardian.IsDeleted = true;
+                }
+
 
                 var guardians = new List<Guardian>();
 
@@ -177,59 +276,89 @@ namespace ValidationServer.Services
 
 
 
-                var documentList = new List<Document>();
-
-
-                if (dto.DocumentsDTO.Signature != null)
+                if (dto.DocumentsDTO != null)
                 {
-                    var sigFile = await _imageService.SaveStudentImageAsync(dto.DocumentsDTO.Signature);
 
-                    documentList.Add(new Document
+                    var documentList = new List<Document>();
+
+                    if (dto.DocumentsDTO != null)
                     {
-                        StudentId = student.Id,
-                        FileName = sigFile,
-                        FilePath = $"/uploads/students/{sigFile}",
-                        DocumentType = DocumentType.Signature,
-                        ContentType = dto.DocumentsDTO.Signature.ContentType
-                    });
+                        foreach (var document in student.Documents)
+                        {
+                            document.IsDeleted = true;
+                        }
+                    }
 
-                    Console.WriteLine("Documents made 1!");
+
+
+                    if (dto.DocumentsDTO.Signature != null)
+                    {
+                        var sigFile = await _imageService.SaveStudentImageAsync(dto.DocumentsDTO.Signature);
+
+                        documentList.Add(new Document
+                        {
+                            StudentId = student.Id,
+                            OwnerId = student.OwnerId,
+                            FileName = sigFile,
+                            FilePath = $"/uploads/students/{sigFile}",
+                            DocumentType = DocumentType.Signature,
+                            ContentType = dto.DocumentsDTO.Signature.ContentType
+                        });
+
+                        Console.WriteLine("Documents made 1!");
+                    }
+
+                    if (dto.DocumentsDTO.Citizenship != null)
+                    {
+                        var ctznFile = await _imageService.SaveStudentImageAsync(dto.DocumentsDTO.Citizenship);
+
+                        documentList.Add(new Document
+                        {
+                            StudentId = student.Id,
+                            OwnerId = student.OwnerId,
+                            FileName = ctznFile,
+                            FilePath = $"/uploads/students/{ctznFile}",
+                            DocumentType = DocumentType.Citizenship,
+                            ContentType = dto.DocumentsDTO.Citizenship.ContentType
+
+                        });
+
+                        Console.WriteLine("Documents made 2 !");
+                    }
+
+                    if (dto.DocumentsDTO.CharacterCertificate != null)
+                    {
+                        var ccFile = await _imageService.SaveStudentImageAsync(dto.DocumentsDTO.CharacterCertificate);
+                        documentList.Add(new Document
+                        {
+                            StudentId = student.Id,
+                            OwnerId = student.OwnerId,
+                            FileName = ccFile,
+                            FilePath = $"/uploads/students/{ccFile}",
+                            DocumentType = DocumentType.CharacterCertificate,
+                            ContentType = dto.DocumentsDTO.CharacterCertificate.ContentType
+                        });
+
+                        Console.WriteLine("Documents made 3 !");
+                    }
+
+                    await _unitOfWork.Documents.AddRangeAsync(documentList);
+
                 }
 
-                if (dto.DocumentsDTO.Citizenship != null)
+
+               
+
+
+
+                if(student.Interests != null)
                 {
-                    var ctznFile = await _imageService.SaveStudentImageAsync(dto.DocumentsDTO.Citizenship);
 
-                    documentList.Add(new Document
+                    foreach (var interest in student.Interests)
                     {
-                        StudentId = student.Id,
-                        FileName = ctznFile,
-                        FilePath = $"/uploads/students/{ctznFile}",
-                        DocumentType = DocumentType.Citizenship,
-                        ContentType = dto.DocumentsDTO.Citizenship.ContentType
-
-                    });
-
-                    Console.WriteLine("Documents made 2 !");
+                        interest.IsDeleted = true;
+                    }
                 }
-
-                if (dto.DocumentsDTO.CharacterCertificate != null)
-                {
-                    var ccFile = await _imageService.SaveStudentImageAsync(dto.DocumentsDTO.CharacterCertificate);
-                    documentList.Add(new Document
-                    {
-                        StudentId = student.Id,
-                        FileName = ccFile,
-                        FilePath = $"/uploads/students/{ccFile}",
-                        DocumentType = DocumentType.CharacterCertificate,
-                        ContentType = dto.DocumentsDTO.CharacterCertificate.ContentType
-                    });
-
-                    Console.WriteLine("Documents made 3 !");
-                }
-
-
-                await _unitOfWork.Documents.AddRangeAsync(documentList);
 
 
 
@@ -251,21 +380,36 @@ namespace ValidationServer.Services
 
 
 
-        
 
 
-                var OtherInformation = new OtherInformation
+                if (dto.OtherInformationDTO != null)
                 {
-                    IsHosteller = dto.OtherInformationDTO.IsHosteller,
-                    TransportationMethod = dto.OtherInformationDTO.TransportationMethod,
-                    StudentId = student.Id
-                };
+                    student.OtherInformation.TransportationMethod = dto.OtherInformationDTO.TransportationMethod;
+                    student.OtherInformation.IsHosteller = dto.OtherInformationDTO.IsHosteller;
+                    student.OtherInformation.UpdatedAt = DateTime.Now;
+                    student.OtherInformation.UpdatedBy = student.OwnerId;
+                }
+               
 
 
-                await _unitOfWork.OtherInformations.AddAsync(OtherInformation);
 
-                
-     
+
+                //var OtherInformation = new OtherInformation
+                //{
+                //    IsHosteller = dto.OtherInformationDTO.IsHosteller,
+                //    TransportationMethod = dto.OtherInformationDTO.TransportationMethod,
+                //    StudentId = student.Id
+                //};
+
+
+                //await _unitOfWork.OtherInformations.AddAsync(OtherInformation);
+
+
+                foreach (var award in student.Awards)
+                {
+                    award.IsDeleted = true;
+                }
+
 
 
                 var AwardList = new List<Award>();
@@ -295,7 +439,7 @@ namespace ValidationServer.Services
 
 
 
-                 await _unitOfWork.SaveAsync();
+                await _unitOfWork.SaveAsync();
 
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -338,6 +482,10 @@ namespace ValidationServer.Services
                     student.ImagePath = "/uploads/students/default-avatar.png";
                 }
 
+
+                student.CreatedAt = DateTime.Now;
+                student.OwnerId = Guid.NewGuid();
+               
                 await _unitOfWork.Students.AddAsync(student);
                 await _unitOfWork.SaveAsync();
 
@@ -351,6 +499,8 @@ namespace ValidationServer.Services
 
                         var address = _mapper.Map<Address>(addressDto);
                         address.StudentId = student.Id;
+                        address.CreatedAt = DateTime.Now;
+                        address.CreatedBy = student.OwnerId;
                         address.AddressType = AddressType.Both;
 
                         await _unitOfWork.Addresses.AddAsync(address);
@@ -362,6 +512,8 @@ namespace ValidationServer.Services
                         {
                             var address = _mapper.Map<Address>(addressDto);
                             address.StudentId = student.Id;
+                            address.CreatedAt = DateTime.Now;
+                            address.CreatedBy = student.OwnerId;
                             address.AddressType = addressDto.IsPermanent == 1
                                 ? AddressType.Permanent
                                 : AddressType.Temporary;
@@ -372,39 +524,47 @@ namespace ValidationServer.Services
                 }
 
 
-  
-
-
                 var guardians = new List<Guardian>();
 
-                foreach(var guardian in dto.GuardianDTO)
+                foreach (var guardian in dto.GuardianDTO)
                 {
                     guardians.Add(new Guardian
                     {
                         StudentId = student.Id,
+
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = student.OwnerId,
+
                         Designation = guardian.Designation,
                         Email = guardian.Email,
                         FullName = guardian.FullName,
                         MobileNumber = guardian.MobileNumber,
                         Occupation = guardian.Occupation,
                         Organization = guardian.Organization,
-                        Relation = guardian.Relation   
+                        Relation = guardian.Relation
                     });
 
                 }
 
-           
+
                 await _unitOfWork.Guardians.AddRangeAsync(guardians);
 
                 // Handle Secondary Info
                 var secondary = _mapper.Map<SecondaryInfo>(dto.SecondaryInfoDTO);
                 secondary.StudentId = student.Id;
-           
+                secondary.CreatedAt = DateTime.Now;
+                secondary.CreatedBy = student.OwnerId;
+
                 await _unitOfWork.SecondaryInfo.AddAsync(secondary);
 
                 // Handle Scholarship
                 var scholarship = _mapper.Map<Scholarship>(dto.ScholarshipDTO);
                 scholarship.StudentId = student.Id;
+
+                scholarship.CreatedAt = DateTime.Now;
+                scholarship.CreatedBy = student.OwnerId;
+
+
                 scholarship.ScholarshipAmount = dto.ScholarshipDTO.ScholarshipAmount;
                 scholarship.ScholarshipType = dto.ScholarshipDTO.ScholarshipType;
                 scholarship.ScholarshipProviderName = dto.ScholarshipDTO.ScholarshipProviderName;
@@ -413,11 +573,15 @@ namespace ValidationServer.Services
                 // Handle Emergency
                 var emergency = _mapper.Map<Emergency>(dto.EmergencyDTO);
                 emergency.StudentId = student.Id;
+                emergency.CreatedAt = DateTime.Now;
+                emergency.CreatedBy = student.OwnerId;
                 await _unitOfWork.Emergency.AddAsync(emergency);
 
                 // Handle Ethnicity
                 var ethnicity = _mapper.Map<Ethnicity>(dto.EthnicityDTO);
                 ethnicity.StudentId = student.Id;
+                ethnicity.CreatedAt = DateTime.Now;
+                ethnicity.CreatedBy = student.OwnerId;
                 await _unitOfWork.Ethinicities.AddAsync(ethnicity);
 
 
@@ -425,6 +589,8 @@ namespace ValidationServer.Services
 
                 var bank = _mapper.Map<Bank>(dto.BankDTO);
                 bank.StudentId = student.Id;
+                bank.CreatedAt = DateTime.Now;
+                bank.CreatedBy = student.OwnerId;
                 await _unitOfWork.Banks.AddAsync(bank);
 
 
@@ -437,6 +603,8 @@ namespace ValidationServer.Services
                     documentList.Add(new Document
                     {
                         StudentId = student.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = student.OwnerId,
                         FileName = sigFile,
                         FilePath = $"/uploads/students/{sigFile}",
                         DocumentType = DocumentType.Signature,
@@ -452,6 +620,8 @@ namespace ValidationServer.Services
                     documentList.Add(new Document
                     {
                         StudentId = student.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = student.OwnerId,
                         FileName = ctznFile,
                         FilePath = $"/uploads/students/{ctznFile}",
                         DocumentType = DocumentType.Citizenship,
@@ -468,6 +638,8 @@ namespace ValidationServer.Services
                     documentList.Add(new Document
                     {
                         StudentId = student.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = student.OwnerId,
                         FileName = ccFile,
                         FilePath = $"/uploads/students/{ccFile}",
                         DocumentType = DocumentType.CharacterCertificate,
@@ -483,6 +655,8 @@ namespace ValidationServer.Services
 
                 var academic_enrollment = _mapper.Map<AcademicEnrollment>(dto.AcademicEnrollmentDTO);
                 academic_enrollment.StudentId = student.Id;
+                academic_enrollment.CreatedAt = DateTime.Now;
+                academic_enrollment.CreatedBy = student.OwnerId;
                 await _unitOfWork.AcademicEnrollments.AddAsync(academic_enrollment);
 
             
@@ -493,6 +667,8 @@ namespace ValidationServer.Services
                     var AcademicHistoryData = new AcademicHistory
                     {
                         StudentId = student.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = student.OwnerId,
                         Level = academichistory.Level,
                         BoardUniversity = academichistory.BoardUniversity,
                         InstitutionName = academichistory.InstitutionName,
@@ -515,6 +691,8 @@ namespace ValidationServer.Services
                 if(citizenshipdata != null)
                 {
                     citizenshipdata.StudentId = student.Id;
+                    citizenshipdata.CreatedAt = DateTime.Now;
+                    citizenshipdata.CreatedBy = student.OwnerId;
                     await _unitOfWork.Citizenships.AddAsync(citizenshipdata);
                 }
 
@@ -526,6 +704,8 @@ namespace ValidationServer.Services
                     Interests.Add(new Interest
                     {
                         StudentId = student.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = student.OwnerId,
                         Name = interest?.Name,
                         OtherInterest = interest?.OtherInterest
                     });
@@ -543,7 +723,9 @@ namespace ValidationServer.Services
                 {
                     IsHosteller = dto.OtherInformationDTO.IsHosteller,
                     TransportationMethod = dto.OtherInformationDTO.TransportationMethod,
-                    StudentId = student.Id
+                    StudentId = student.Id,
+                    CreatedAt = DateTime.Now,
+                    CreatedBy = student.OwnerId
                 };
 
 
@@ -564,7 +746,9 @@ namespace ValidationServer.Services
                         Title = award.Title,
                         IssuingOrganization = award.IssuingOrganization,
                         YearReceived = award.YearReceived,
-                        StudentId = student.Id
+                        StudentId = student.Id,
+                        CreatedAt = DateTime.Now,
+                        CreatedBy = student.OwnerId
 
                     });
 
@@ -582,7 +766,7 @@ namespace ValidationServer.Services
 
 
 
-                //await _unitOfWork.SaveAsync();
+                await _unitOfWork.SaveAsync();
                 await _unitOfWork.CommitTransactionAsync();
 
                 return true;

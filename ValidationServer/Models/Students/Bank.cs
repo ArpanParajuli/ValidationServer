@@ -2,9 +2,9 @@
 
 namespace ValidationServer.Models.Students
 {
-    public class Bank
+    public class Bank : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string? BankAccountHolderName { get; set; }
         public string? BankName { get; set; }
         public string? BankAccountNumber { get; set; }

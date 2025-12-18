@@ -1,8 +1,8 @@
 namespace ValidationServer.Models.Students
 {
-    public class SecondaryInfo
+    public class SecondaryInfo : BaseEntity
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         public string? MiddleName { get; set; }
         public string? AlternateEmail { get; set; }
         public string? SecondaryMobile { get; set; }

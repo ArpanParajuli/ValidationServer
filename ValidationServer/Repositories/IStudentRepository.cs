@@ -7,5 +7,8 @@ namespace ValidationServer.Repositories
     public interface IStudentRepository
     {
         Task<Student?> GetById(int id);
+        Task<Student?> GetByOwnerId(Guid OwnerId);
+
+        IQueryable<Student> GetAllStudentsFiltered();
     }
 }
