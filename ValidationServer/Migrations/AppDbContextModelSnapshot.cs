@@ -94,7 +94,8 @@ namespace ValidationServer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Level")
+                    b.Property<int?>("Level")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<DateOnly>("PassedYear")
@@ -152,6 +153,37 @@ namespace ValidationServer.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("Addresses");
+                });
+
+            modelBuilder.Entity("ValidationServer.Models.Students.Award", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IssuingOrganization")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateOnly>("YearReceived")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Awards");
                 });
 
             modelBuilder.Entity("ValidationServer.Models.Students.Bank", b =>
@@ -418,10 +450,33 @@ namespace ValidationServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StudentId")
-                        .IsUnique();
+                    b.HasIndex("StudentId");
 
                     b.ToTable("Guardians");
+                });
+
+            modelBuilder.Entity("ValidationServer.Models.Students.Interest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OtherInterest")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Interests");
                 });
 
             modelBuilder.Entity("ValidationServer.Models.Students.Nationality", b =>
@@ -444,6 +499,33 @@ namespace ValidationServer.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("Nationalities");
+                });
+
+            modelBuilder.Entity("ValidationServer.Models.Students.OtherInformation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IsHosteller")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransportationMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId")
+                        .IsUnique();
+
+                    b.ToTable("OtherInformations");
                 });
 
             modelBuilder.Entity("ValidationServer.Models.Students.Scholarship", b =>
@@ -590,6 +672,17 @@ namespace ValidationServer.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("ValidationServer.Models.Students.Award", b =>
+                {
+                    b.HasOne("ValidationServer.Models.Students.Student", "Student")
+                        .WithMany("Awards")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("ValidationServer.Models.Students.Bank", b =>
                 {
                     b.HasOne("ValidationServer.Models.Students.Student", "Student")
@@ -681,8 +774,19 @@ namespace ValidationServer.Migrations
             modelBuilder.Entity("ValidationServer.Models.Students.Guardian", b =>
                 {
                     b.HasOne("ValidationServer.Models.Students.Student", "Student")
-                        .WithOne("Guardian")
-                        .HasForeignKey("ValidationServer.Models.Students.Guardian", "StudentId")
+                        .WithMany("Guardians")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("ValidationServer.Models.Students.Interest", b =>
+                {
+                    b.HasOne("ValidationServer.Models.Students.Student", "Student")
+                        .WithMany("Interests")
+                        .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -694,6 +798,17 @@ namespace ValidationServer.Migrations
                     b.HasOne("ValidationServer.Models.Students.Student", "Student")
                         .WithMany()
                         .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("ValidationServer.Models.Students.OtherInformation", b =>
+                {
+                    b.HasOne("ValidationServer.Models.Students.Student", "Student")
+                        .WithOne("OtherInformation")
+                        .HasForeignKey("ValidationServer.Models.Students.OtherInformation", "StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -730,6 +845,8 @@ namespace ValidationServer.Migrations
 
                     b.Navigation("Addresses");
 
+                    b.Navigation("Awards");
+
                     b.Navigation("Bank");
 
                     b.Navigation("Citizenship");
@@ -741,7 +858,11 @@ namespace ValidationServer.Migrations
                     b.Navigation("Ethnicity")
                         .IsRequired();
 
-                    b.Navigation("Guardian");
+                    b.Navigation("Guardians");
+
+                    b.Navigation("Interests");
+
+                    b.Navigation("OtherInformation");
 
                     b.Navigation("Scholarship");
 

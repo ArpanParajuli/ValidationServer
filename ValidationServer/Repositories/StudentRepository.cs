@@ -18,120 +18,13 @@ namespace ValidationServer.Repositories
             _mapper = mapper;
           
         }
-        //public async Task<StudentUpdateDTO?> GetById(int id)
-        //{
-        //    var studentEntity = await _appDbContext.Students
-        //        .FirstOrDefaultAsync(x => x.Id == id);
-
-        //    if (studentEntity == null)
-        //        return null;
-
-        //    // Load related data
-        //    var address = await _appDbContext.Addresses.FirstOrDefaultAsync(x => x.StudentId == id);
-        //    var guardian = await _appDbContext.Guardians.FirstOrDefaultAsync(x => x.StudentId == id);
-        //    var secondary = await _appDbContext.SecondaryInfos.FirstOrDefaultAsync(x => x.StudentId == id);
-        //    var citizenship = await _appDbContext.Citizenships.FirstOrDefaultAsync(x => x.StudentId == id);
-        //    var scholarship = await _appDbContext.Scholarships.FirstOrDefaultAsync(x => x.StudentId == id);
-        //    var emergency = await _appDbContext.Emergencies.FirstOrDefaultAsync(x => x.StudentId == id);
-        //    var ethnicity = await _appDbContext.Ethnicities.FirstOrDefaultAsync(x => x.StudentId == id);
-        //    var enrollment = await _appDbContext.AcademicEnrollments.FirstOrDefaultAsync(x => x.StudentId == id);
-
-        //    var dto = new StudentUpdateDTO
-        //    {
-        //        StudentDTO = new StudentDTO
-        //        {
-        //            Email = studentEntity.Email,
-        //            DateOfBirth = studentEntity.DateOfBirth,
-        //            FirstName = studentEntity.FirstName,
-        //            LastName = studentEntity.LastName,
-        //            MiddleName = studentEntity.MiddleName,
-        //            Gender = studentEntity.Gender,
-        //            PrimaryMobile = studentEntity.PrimaryMobile,
-        //            PlaceOfBirth = studentEntity.PlaceOfBirth
-        //        },
-
-        //        AddressDTO = address == null ? null : new AddressDTO
-        //        {
-        //            District = address.District,
-        //            HouseNumber = address.HouseNumber,
-        //            Municipality = address.Municipality,
-        //            Province = address.Province,
-        //            ToleStreet = address.ToleStreet,
-        //            WardNumber = address.WardNumber
-        //        },
-
-        //        GuardianDTO = guardian == null ? null : new GuardianDTO
-        //        {
-        //            FullName = guardian.FullName,
-        //            Relation = guardian.Relation,
-        //            Email = guardian.Email,
-        //            MobileNumber = guardian.MobileNumber,
-        //            Occupation = guardian.Occupation
-        //        },
-
-        //        SecondaryInfoDTO = secondary == null ? null : new SecondaryInfoDTO
-        //        {
-        //            AlternateEmail = secondary.AlternateEmail,
-        //            BloodGroup = secondary.BloodGroup,
-        //            MaritalStatus = secondary.MaritalStatus,
-        //            MiddleName = secondary.MiddleName,
-        //            Religion = secondary.Religion,
-        //            SecondaryMobile = secondary.SecondaryMobile
-        //        },
-
-        //        CitizenshipDTO = citizenship == null ? null : new CitizenshipDTO
-        //        {
-        //            CitizenshipIssueDate = citizenship.CitizenshipIssueDate,
-        //            CitizenshipIssueDistrict = citizenship.CitizenshipIssueDistrict,
-        //            CitizenshipNumber = citizenship.CitizenshipNumber
-        //        },
-
-        //        ScholarshipDTO = scholarship == null ? null : new ScholarshipDTO
-        //        {
-        //            ScholarshipAmount = scholarship.Amount,
-        //            ScholarshipProviderName = scholarship.ProviderName,
-        //            ScholarshipType = scholarship.Type
-        //        },
-
-        //        EmergencyDTO = emergency == null ? null : new EmergencyDTO
-        //        {
-        //            EmergencyContactName = emergency.EmergencyContactName,
-        //            EmergencyContactNumber = emergency.EmergencyContactNumber,
-        //            EmergencyContactRelation = emergency.EmergencyContactRelation
-        //        },
-
-        //        EthnicityDTO = ethnicity == null ? null : new EthnicityDTO
-        //        {
-        //            EthnicityGroup = ethnicity.EthnicityGroup,
-        //            EthnicityName = ethnicity.EthnicityName
-        //        },
-
-        //        AcademicEnrollmentDTO = enrollment == null ? null : new AcademicEnrollmentDTO
-        //        {
-        //            AcademicStatus = (int)enrollment.AcademicStatus,
-        //            EnrollDate = enrollment.EnrollDate,
-        //            Faculty = enrollment.Faculty,
-        //            Level = enrollment.Level,
-        //            Program = enrollment.Program,
-        //            Section = enrollment.Section,
-        //            RegistrationNumber = enrollment.RegistrationNumber,
-        //            RollNumber = enrollment.RollNumber,
-        //            Semester = enrollment.Semester
-        //        },
-
-        //        AcademicHistories = null // You can load later
-        //    };
-
-        //    return dto;
-        //}
-
-
+      
         public async Task<Student?> GetById(int id)
         {
 
             var student = await _appDbContext.Students
                 .Include(s => s.Addresses)
-                .Include(s => s.Guardian)
+                .Include(s => s.Guardians)
                 .Include(s => s.SecondaryInfo)
                 .Include(s => s.Citizenship)
                 .Include(s => s.Scholarship)
@@ -140,6 +33,9 @@ namespace ValidationServer.Repositories
                 .Include(s => s.AcademicEnrollment)
                 .Include(s => s.AcademicHistories)
                 .Include(s => s.Bank)
+                .Include(s => s.Awards)
+                .Include(s => s.Interests)
+                .Include(s => s.OtherInformation)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
 

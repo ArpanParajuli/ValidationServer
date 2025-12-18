@@ -25,7 +25,6 @@ namespace ValidationServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            //var obj = new CreateStudentDTO();
             var obj = await _studentService.GetAllStudentAsync();
             return Ok(obj);
         }
@@ -55,7 +54,7 @@ namespace ValidationServer.Controllers
 
 
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id , [FromForm] CreateStudentDTO dto)
+        public async Task<IActionResult> Update(int id , [FromForm] StudentUpdateDTO dto)
         {
            var IsSuccess =  await _studentService.Update(id,dto);
 

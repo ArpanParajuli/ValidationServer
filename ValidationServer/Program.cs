@@ -37,7 +37,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("NextJsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") 
+        policy.WithOrigins("http://localhost:3000",
+                "https://*.ngrok-free.app") 
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

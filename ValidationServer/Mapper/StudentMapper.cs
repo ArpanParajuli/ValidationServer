@@ -28,7 +28,7 @@ namespace ValidationServer.Mapper
             CreateMap<CitizenshipDTO, Citizenship>().ReverseMap();
 
             // Guardian
-            CreateMap<GuardianDTO, Guardian>().ReverseMap();
+            CreateMap <GuardianDTO, Guardian>().ReverseMap();
 
             // Scholarship
             CreateMap<ScholarshipDTO, Scholarship>().ReverseMap();
@@ -45,15 +45,26 @@ namespace ValidationServer.Mapper
             // Documents
             CreateMap<DocumentsDTO, Document>().ReverseMap();
 
-            // Academic Enrollment
+      
             CreateMap<AcademicEnrollmentDTO, AcademicEnrollment>().ReverseMap();
 
-            // Academic History (fixed mapping!)
             CreateMap<AcademicHistoryDTO, AcademicHistory>().ReverseMap();
 
 
             CreateMap<BankDTO, Bank>().ReverseMap();
 
-        }
+
+            CreateMap<OtherInformation, OtherInformationDTO>().ReverseMap();
+
+            CreateMap<Award, AwardDTO>().ReverseMap();
+
+            CreateMap<Interest, InterestDTO>().ReverseMap();
+
+
+
+
+  
+
     }
+}
 }

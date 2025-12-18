@@ -27,6 +27,12 @@ namespace ValidationServer.UOW
 
        IStudentRepository StudentRepository { get; }
 
+        IGenericRepository<Award> Awards { get; }
+
+         IGenericRepository<OtherInformation> OtherInformations { get; }
+
+        IGenericRepository<Interest> Interests { get; }
+
 
         Task<int> SaveAsync();
 

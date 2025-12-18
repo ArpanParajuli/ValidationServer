@@ -10,7 +10,7 @@ namespace ValidationServer.UOW
     {
         private readonly AppDbContext _context;
 
-        private  IDbContextTransaction _transaction;
+        private IDbContextTransaction _transaction;
         public IGenericRepository<Student> Students { get; }
         public IGenericRepository<Address> Addresses { get; }
         public IGenericRepository<Guardian> Guardians { get; }
@@ -29,8 +29,13 @@ namespace ValidationServer.UOW
 
         public IGenericRepository<AcademicHistory> AcademicHistorys { get; }
 
+        public IGenericRepository<Interest> Interests { get; }
 
         public IStudentRepository StudentRepository { get; }
+
+        public IGenericRepository<Award> Awards { get; }
+
+        public IGenericRepository<OtherInformation> OtherInformations { get; }
 
 
         public UnitOfWork(AppDbContext context,
@@ -48,7 +53,11 @@ namespace ValidationServer.UOW
             IGenericRepository<Document> documents,
             IGenericRepository<AcademicHistory> academicHistorys,
             IGenericRepository<AcademicEnrollment> academicEnrollments,
-            IStudentRepository studentRepository
+            IStudentRepository studentRepository,
+            IGenericRepository<Award> awards,
+            IGenericRepository<OtherInformation> otherInformation,
+            IGenericRepository<Interest> interests
+
             )
         {
             _context = context;
@@ -68,6 +77,10 @@ namespace ValidationServer.UOW
             AcademicHistorys = academicHistorys;
 
             StudentRepository = studentRepository;
+
+            Awards = awards;
+            OtherInformations = otherInformation;
+            Interests = interests;
         }
 
         public async Task<int> SaveAsync()

@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using ValidationServer.DTOs;
 using ValidationServer.DTOs.Response;
@@ -41,7 +43,7 @@ namespace ValidationServer.Services
             {
                 StudentDTO = _mapper.Map<StudentResDTO>(student),
                 AddressDTO = student.Addresses != null ? _mapper.Map<List<AddressDTO>>(student.Addresses) : null,
-                GuardianDTO = student.Guardian != null ? _mapper.Map<GuardianDTO>(student.Guardian) : null,
+                GuardianDTO = student.Guardians != null ? _mapper.Map<List<GuardianDTO>>(student.Guardians) : null,
                 SecondaryInfoDTO = student.SecondaryInfo != null ? _mapper.Map<SecondaryInfoDTO>(student.SecondaryInfo) : null,
                 CitizenshipDTO = student.Citizenship != null ? _mapper.Map<CitizenshipDTO>(student.Citizenship) : null,
                 ScholarshipDTO = student.Scholarship != null ? _mapper.Map<ScholarshipDTO>(student.Scholarship) : null,
@@ -49,7 +51,11 @@ namespace ValidationServer.Services
                 EthnicityDTO = student.Ethnicity != null ? _mapper.Map<EthnicityDTO>(student.Ethnicity) : null,
                 AcademicEnrollmentDTO = student.AcademicEnrollment != null ? _mapper.Map<AcademicEnrollmentDTO>(student.AcademicEnrollment) : null,
                 AcademicHistories = student.AcademicHistories != null ? _mapper.Map<List<AcademicHistoryDTO>>(student.AcademicHistories) : null,
-                BankDTO = student.Bank != null ? _mapper.Map<BankDTO>(student.Bank) : null
+                BankDTO = student.Bank != null ? _mapper.Map<BankDTO>(student.Bank) : null,
+                AwardDTO  = student.Awards != null ? _mapper.Map<List<AwardDTO>>(student.Awards) : null,
+                InterestDTO = student.Interests != null ? _mapper.Map<List<InterestDTO>>(student.Interests) : null,
+                OtherInformationDTO = student.OtherInformation != null ? _mapper.Map<OtherInformationDTO>(student.OtherInformation) : null,
+
             };
 
             return dto;
@@ -69,7 +75,7 @@ namespace ValidationServer.Services
             return false;
         }
 
-        public async Task<bool> Update(int id, CreateStudentDTO dto)
+        public async Task<bool> Update(int id, StudentUpdateDTO dto)
         {
 
 
@@ -122,7 +128,7 @@ namespace ValidationServer.Services
 
                 _mapper.Map(dto.SecondaryInfoDTO, student.SecondaryInfo);
 
-                _mapper.Map(dto.GuardianDTO, student.Guardian);
+                //_mapper.Map(dto.GuardianDTO, student.Guardians);
 
                 _mapper.Map(dto.EmergencyDTO, student.Emergency);
 
@@ -147,6 +153,27 @@ namespace ValidationServer.Services
                         }
                     }
                 }
+
+                var guardians = new List<Guardian>();
+
+                foreach (var guardian in dto.GuardianDTO)
+                {
+                    guardians.Add(new Guardian
+                    {
+                        StudentId = student.Id,
+                        Designation = guardian.Designation,
+                        Email = guardian.Email,
+                        FullName = guardian.FullName,
+                        MobileNumber = guardian.MobileNumber,
+                        Occupation = guardian.Occupation,
+                        Organization = guardian.Organization,
+                        Relation = guardian.Relation
+                    });
+
+                }
+
+
+                await _unitOfWork.Guardians.AddRangeAsync(guardians);
 
 
 
@@ -204,10 +231,71 @@ namespace ValidationServer.Services
 
                 await _unitOfWork.Documents.AddRangeAsync(documentList);
 
-                // _unitOfWork.Students.Update(student);
 
 
-                await _unitOfWork.SaveAsync();
+
+                var Interests = new List<Interest>();
+
+                foreach(var interest in dto.InterestDTO)
+                {
+                    Interests.Add(new Interest
+                    {
+                        StudentId = student.Id,
+                        Name = interest.Name,
+                        OtherInterest = interest.OtherInterest
+                    });
+                }
+
+
+                await _unitOfWork.Interests.AddRangeAsync(Interests);
+
+
+
+        
+
+
+                var OtherInformation = new OtherInformation
+                {
+                    IsHosteller = dto.OtherInformationDTO.IsHosteller,
+                    TransportationMethod = dto.OtherInformationDTO.TransportationMethod,
+                    StudentId = student.Id
+                };
+
+
+                await _unitOfWork.OtherInformations.AddAsync(OtherInformation);
+
+                
+     
+
+
+                var AwardList = new List<Award>();
+
+
+                foreach(var award in dto.AwardDTO)
+                {
+
+                    AwardList.Add(new Award
+                    {
+                        Title = award.Title,
+                        IssuingOrganization = award.IssuingOrganization,
+                        YearReceived = award.YearReceived,
+                        StudentId = student.Id
+
+                    });
+
+
+                };
+
+
+
+
+
+                await _unitOfWork.Awards.AddRangeAsync(AwardList);
+
+
+
+
+                 await _unitOfWork.SaveAsync();
 
                 await _unitOfWork.CommitTransactionAsync();
 
@@ -284,10 +372,29 @@ namespace ValidationServer.Services
                 }
 
 
-                // Handle Guardian
-                var guardian = _mapper.Map<Guardian>(dto.GuardianDTO);
-                guardian.StudentId = student.Id;
-                await _unitOfWork.Guardians.AddAsync(guardian);
+  
+
+
+                var guardians = new List<Guardian>();
+
+                foreach(var guardian in dto.GuardianDTO)
+                {
+                    guardians.Add(new Guardian
+                    {
+                        StudentId = student.Id,
+                        Designation = guardian.Designation,
+                        Email = guardian.Email,
+                        FullName = guardian.FullName,
+                        MobileNumber = guardian.MobileNumber,
+                        Occupation = guardian.Occupation,
+                        Organization = guardian.Organization,
+                        Relation = guardian.Relation   
+                    });
+
+                }
+
+           
+                await _unitOfWork.Guardians.AddRangeAsync(guardians);
 
                 // Handle Secondary Info
                 var secondary = _mapper.Map<SecondaryInfo>(dto.SecondaryInfoDTO);
@@ -412,8 +519,67 @@ namespace ValidationServer.Services
                 }
 
 
+                var Interests = new List<Interest>();
 
-               
+                foreach (var interest in dto.InterestDTO)
+                {
+                    Interests.Add(new Interest
+                    {
+                        StudentId = student.Id,
+                        Name = interest?.Name,
+                        OtherInterest = interest?.OtherInterest
+                    });
+                }
+
+
+                await _unitOfWork.Interests.AddRangeAsync(Interests);
+
+
+
+
+
+
+                var OtherInformation = new OtherInformation
+                {
+                    IsHosteller = dto.OtherInformationDTO.IsHosteller,
+                    TransportationMethod = dto.OtherInformationDTO.TransportationMethod,
+                    StudentId = student.Id
+                };
+
+
+                await _unitOfWork.OtherInformations.AddAsync(OtherInformation);
+
+
+
+
+
+                var AwardList = new List<Award>();
+
+
+                foreach (var award in dto.AwardDTO)
+                {
+
+                    AwardList.Add(new Award
+                    {
+                        Title = award.Title,
+                        IssuingOrganization = award.IssuingOrganization,
+                        YearReceived = award.YearReceived,
+                        StudentId = student.Id
+
+                    });
+
+
+                }
+                ;
+
+
+
+
+
+                await _unitOfWork.Awards.AddRangeAsync(AwardList);
+
+
+
 
 
                 //await _unitOfWork.SaveAsync();

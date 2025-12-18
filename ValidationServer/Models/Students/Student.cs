@@ -16,7 +16,7 @@
 
         
         public Citizenship? Citizenship { get; set; }
-        public Guardian? Guardian { get; set; }
+    
         public Scholarship? Scholarship { get; set; }
         public Emergency? Emergency { get; set; }
         public SecondaryInfo? SecondaryInfo { get; set; }
@@ -29,10 +29,23 @@
         public Bank? Bank { get; set; }
 
 
+        public OtherInformation? OtherInformation { get; set; }
+
         public ICollection<Address>? Addresses { get; set; }
         
         public ICollection<AcademicHistory>? AcademicHistories { get; set; }
         public ICollection<Document>? Documents { get; set; }
+
+        public ICollection<Guardian> Guardians { get; set; } = new List<Guardian>();
+
+        public ICollection<Award> Awards { get; set; } = new List<Award>();
+
+        public ICollection<Interest> Interests { get; set; } = new List<Interest>();
+
+
+
+
+       
 
     }
 }

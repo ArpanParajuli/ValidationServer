@@ -11,7 +11,7 @@ namespace ValidationServer.Services
 
         Task<StudentReponseDTO?> GetStudentByIdAsync(int id);
 
-        Task<bool> Update(int id, CreateStudentDTO dto);
+        Task<bool> Update(int id, StudentUpdateDTO dto);
 
         Task<bool> Delete(int id);
 
