@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using ValidationServer.Application.Commands.Students.CreateStudent;
+using ValidationServer.Application.Commands.Students.DeleteStudent;
 using ValidationServer.DTOs;
 using ValidationServer.Models.Students;
 using ValidationServer.Services;
@@ -79,7 +80,8 @@ namespace ValidationServer.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var IsSuccess = await _studentService.Delete(id);
+            //var IsSuccess = await _studentService.Delete(id);
+            var IsSuccess = await _mediatR.Send(new DeleteStudentCommand(id));
 
             if (!IsSuccess)
             {
