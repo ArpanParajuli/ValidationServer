@@ -380,8 +380,6 @@ namespace ValidationServer.Services
 
 
 
-
-
                 if (dto.OtherInformationDTO != null)
                 {
                     student.OtherInformation.TransportationMethod = dto.OtherInformationDTO.TransportationMethod;

@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using ValidationServer.Application.Commands.Students.CreateStudent;
 using ValidationServer.DTOs;
 using ValidationServer.Models.Students;
 using ValidationServer.Services;
@@ -16,10 +18,12 @@ namespace ValidationServer.Controllers
     {
   
         private readonly IStudentService _studentService;
+        private readonly IMediator _mediatR;
 
-        public StudentController(IStudentService studentService)
+        public StudentController(IStudentService studentService , IMediator mediatR)
         {
             _studentService = studentService;
+            _mediatR = mediatR;
         }
 
         [HttpGet]
@@ -42,9 +46,15 @@ namespace ValidationServer.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] CreateStudentDTO dto)
         {
-            var IsSuccess =  await _studentService.Create(dto);
 
-            if(!IsSuccess)
+            CreateStudentCommand command = new CreateStudentCommand(dto);
+
+
+            //var IsSuccess =  await _studentService.Create(dto);
+
+            var IsSuccess = await _mediatR.Send(command);
+
+            if (!IsSuccess)
             {
                 return BadRequest(new { message = "Failed to create student" });
             }

@@ -8,6 +8,8 @@ using ValidationServer.Repositories;
 using ValidationServer.Services;
 using ValidationServer.UOW;
 
+using MediatR;
+
 
 
 
@@ -18,6 +20,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddMediatR(configuration =>
+{
+    configuration.RegisterServicesFromAssembly(typeof(Program).Assembly);
+});
 
 
 
@@ -44,7 +51,8 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-//builder.Services.AddControllers();
+
+
 builder.Services.AddControllers()
     .AddJsonOptions(o =>
     {
