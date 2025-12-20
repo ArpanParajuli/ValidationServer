@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using ValidationServer.Application.Commands.Students.CreateStudent;
 using ValidationServer.Application.Commands.Students.DeleteStudent;
+using ValidationServer.Application.Queries.GetAllStudents;
+using ValidationServer.Application.Queries.GetStudentById;
 using ValidationServer.DTOs;
 using ValidationServer.Models.Students;
 using ValidationServer.Services;
@@ -30,17 +32,18 @@ namespace ValidationServer.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var obj = await _studentService.GetAllStudentAsync();
-            return Ok(obj);
+            var GetAllStudents = await _mediatR.Send(new GetAllStudentsCommand());
+            //var obj = await _studentService.GetAllStudentAsync();
+            return Ok(GetAllStudents);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
+            var student = await _mediatR.Send(new GetStudentByIdCommand(id));
+            //var obj = await _studentService.GetStudentByIdAsync(id);
 
-            var obj = await _studentService.GetStudentByIdAsync(id);
-
-            return Ok(obj);
+            return Ok(student);
         }
 
 

@@ -21,8 +21,6 @@
 
   <ItemGroup>
     <Folder Include="Application\Commands\Students\UpdateStudent\" />
-    <Folder Include="Application\Queries\GetStudentById\" />
-    <Folder Include="Application\Queries\GetAllStudents\" />
     <Folder Include="wwwroot\uploads\students\" />
   </ItemGroup>
 
