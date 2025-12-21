@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using ValidationServer.Application.Commands.Students.CreateStudent;
 using ValidationServer.Application.Commands.Students.DeleteStudent;
+using ValidationServer.Application.Commands.Students.UpdateStudent;
 using ValidationServer.Application.Queries.GetAllStudents;
 using ValidationServer.Application.Queries.GetStudentById;
 using ValidationServer.DTOs;
@@ -70,9 +71,10 @@ namespace ValidationServer.Controllers
         [HttpPut("update/{id}")]
         public async Task<IActionResult> Update(Guid id , [FromForm] StudentUpdateDTO dto)
         {
-           var IsSuccess =  await _studentService.Update(id,dto);
+           //var IsSuccess =  await _studentService.Update(id,dto);
+            var IsSuccess = await _mediatR.Send(new UpdateStudentCommand(id, dto));
 
-            if(!IsSuccess)
+            if (!IsSuccess)
             {
                 return NotFound(new { message = "Student not found" });
             }

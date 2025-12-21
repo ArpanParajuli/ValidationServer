@@ -5,6 +5,7 @@ using ValidationServer.DTOs;
 using ValidationServer.DTOs.Response;
 using ValidationServer.Models.Students;
 using MediatR;
+using ValidationServer.Models.Enums;
 
 
 namespace ValidationServer.Application.Queries.GetStudentById
@@ -36,10 +37,36 @@ namespace ValidationServer.Application.Queries.GetStudentById
                   .Include(s => s.Bank)
                   .Include(s => s.OtherInformation)
 
-                  .FirstOrDefaultAsync(s => s.OwnerId == command.Id && !s.IsDeleted);
+                  .FirstOrDefaultAsync(s => s.OwnerId == command.Id && !s.IsDeleted , ct);
 
             if (student == null)
                 return null;
+
+
+            var documentsDto = new DocumentResDTO();
+
+            if(student.Documents != null)
+            {
+                foreach(var document in student.Documents)
+                {
+                    if(document.DocumentType == DocumentType.CharacterCertificate)
+                    {
+                        documentsDto.CharacterCertificate = document.FilePath;
+                    }
+
+                    if(document.DocumentType == DocumentType.Citizenship)
+                    {
+                        documentsDto.Citizenship = document.FilePath;
+                    }
+
+                    if (document.DocumentType == DocumentType.Signature)
+                    {
+                        documentsDto.Signature = document.FilePath;
+                    }
+
+                }
+            }
+            
 
             var dto = new StudentReponseDTO
             {
@@ -57,8 +84,9 @@ namespace ValidationServer.Application.Queries.GetStudentById
                 AwardDTO = student.Awards != null ? _mapper.Map<List<AwardDTO>>(student.Awards) : null,
                 InterestDTO = student.Interests != null ? _mapper.Map<List<InterestDTO>>(student.Interests) : null,
                 OtherInformationDTO = student.OtherInformation != null ? _mapper.Map<OtherInformationDTO>(student.OtherInformation) : null,
+                DocumentsDTO = documentsDto
 
-            };
+            }; 
 
             return dto;
         }

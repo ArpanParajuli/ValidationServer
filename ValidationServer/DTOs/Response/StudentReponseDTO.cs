@@ -13,7 +13,7 @@ namespace ValidationServer.DTOs.Response
         public ScholarshipDTO ScholarshipDTO { get; set; } = new();
         public EmergencyDTO EmergencyDTO { get; set; } = new();
         public EthnicityDTO EthnicityDTO { get; set; } = new();
-        public DocumentsDTO DocumentsDTO { get; set; } = new();
+        public DocumentResDTO DocumentsDTO { get; set; } = new();
         public AcademicEnrollmentDTO AcademicEnrollmentDTO { get; set; } = new();
         public List<AcademicHistoryDTO> AcademicHistories { get; set; } = new();
         public BankDTO BankDTO { get; set; } = new();

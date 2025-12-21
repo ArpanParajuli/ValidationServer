@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Commands\Students\UpdateStudent\" />
     <Folder Include="wwwroot\uploads\students\" />
   </ItemGroup>
 
